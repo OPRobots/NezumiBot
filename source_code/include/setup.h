@@ -12,6 +12,7 @@
 #include <libopencm3/stm32/usart.h>
 
 #include "config.h"
+#include "sensors.h"
 
 void setup(void);
 
