@@ -3,6 +3,7 @@
 
 #include "config.h"
 #include "stdint.h"
+#include "encoders.h"
 #include <libopencm3/stm32/adc.h>
 #include <libopencm3/stm32/gpio.h>
 #include <libopencm3/stm32/rcc.h>
