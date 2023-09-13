@@ -152,7 +152,6 @@ static void setup_motors_pwm(void) {
   timer_set_prescaler(TIM2, rcc_apb2_frequency * 2 / 4000000 - 2);
   // 4000000 es la frecuencia a la que irá el PWM 4 kHz, los dos últimos ceros no se porqué, pero son necesarios ya que rcc_apb2_frequency también añade dos ceros a mayores
   timer_set_repetition_counter(TIM2, 0);
-  timer_enable_preload(TIM2);
   timer_continuous_mode(TIM2);
   timer_set_period(TIM2, MOTORES_MAX_PWM);
 

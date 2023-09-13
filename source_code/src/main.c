@@ -21,7 +21,7 @@ int main(void) {
 		printf("EI: %ld\t", get_encoder_left_total_ticks());
 		printf("ED: %ld\t", get_encoder_right_total_ticks());
 		*/
-		set_motors_speed(100, 100);
+		set_motors_speed(0, 0);
 		printf("Funciona?\n");
     }
   return 0;
