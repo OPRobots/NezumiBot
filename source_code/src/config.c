@@ -11,7 +11,7 @@ uint16_t get_start_millis(void) {
  * @brief Establece la configuración de encoders
  * 
  */
-static void set_micrometers_per_tick() {
+static void set_micrometers_per_tick(void) {
   _micrometers_per_tick = MICROMETERS_PER_TICK_MICROMOUSE;
 }
 

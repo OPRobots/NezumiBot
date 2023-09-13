@@ -21,6 +21,7 @@ static void setup_clock(void) {
   rcc_periph_clock_enable(RCC_ADC1);
   rcc_periph_clock_enable(RCC_DMA2);
   
+  rcc_periph_clock_enable(RCC_TIM2);
   rcc_periph_clock_enable(RCC_TIM3);
   rcc_periph_clock_enable(RCC_TIM4);
 
@@ -40,7 +41,7 @@ static void setup_systick(void) {
 static void setup_timer_priorities(void) {
   nvic_set_priority(NVIC_SYSTICK_IRQ, 16 * 1);
   nvic_set_priority(NVIC_DMA2_STREAM0_IRQ, 16 * 2);
-  nvic_set_priority(NVIC_USART1_IRQ, 16 * 2);
+  nvic_set_priority(NVIC_USART1_IRQ, 16 * 4);
 
 
   nvic_enable_irq(NVIC_DMA2_STREAM0_IRQ);
@@ -57,16 +58,24 @@ static void setup_gpio(void) {
   // Botones de menú //TODOO
   //gpio_mode_setup(GPIOB, GPIO_MODE_INPUT, GPIO_PUPD_PULLUP, GPIO13 | GPIO14 | GPIO15);
 
-  // Salida PWM para los motores
-  gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO5 | GPIO10 );
-  gpio_set_af(GPIOB, GPIO_AF2, GPIO5 | GPIO10);
-
   // Entradas analógicas sensores
   gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO0 | GPIO1 | GPIO2 | GPIO3 );
 
    // Entradas Encoders
   gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO4 | GPIO5 | GPIO6 | GPIO7);
   gpio_set_af(GPIOB, GPIO_AF2, GPIO4 | GPIO5 | GPIO6 | GPIO7);
+
+    // Salida PWM Motores
+  gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO5);
+  gpio_set_af(GPIOA, GPIO_AF1, GPIO5);
+  gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO10);
+  gpio_set_af(GPIOB, GPIO_AF1, GPIO10);
+
+  // Salidas Digitales Motores
+  gpio_mode_setup(GPIOA, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO6 | GPIO7 ); //6-bin2 7-bin1
+  gpio_clear(GPIOA, GPIO6 | GPIO7);
+  gpio_mode_setup(GPIOB, GPIO_MODE_OUTPUT, GPIO_PUPD_NONE, GPIO0 | GPIO1 | GPIO2); //posible 0 no necesario 0-stby 1-ain1 2ain2
+  gpio_clear(GPIOB, GPIO0 | GPIO1 | GPIO2);
 
   // USART1
   gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO9 | GPIO10);
@@ -132,13 +141,40 @@ static void setup_dma_adc1(void) {
   adc_set_dma_continue(ADC1);
 }
 
+/**
+ * @brief Configura el TIM2 para manejar el PWM de los Motores, inicialmente a 4kHz
+ * 
+ */
+static void setup_motors_pwm(void) {
+  timer_set_mode(TIM2, TIM_CR1_CKD_CK_INT, TIM_CR1_CMS_EDGE, TIM_CR1_DIR_UP);
+
+  //84000000
+  timer_set_prescaler(TIM2, rcc_apb2_frequency * 2 / 4000000 - 2);
+  // 4000000 es la frecuencia a la que irá el PWM 4 kHz, los dos últimos ceros no se porqué, pero son necesarios ya que rcc_apb2_frequency también añade dos ceros a mayores
+  timer_set_repetition_counter(TIM2, 0);
+  timer_enable_preload(TIM2);
+  timer_continuous_mode(TIM2);
+  timer_set_period(TIM2, MOTORES_MAX_PWM);
+
+  timer_set_oc_mode(TIM2, TIM_OC1, TIM_OCM_PWM1);
+  timer_set_oc_mode(TIM2, TIM_OC3, TIM_OCM_PWM1);
+  timer_set_oc_value(TIM2, TIM_OC1, 0);
+  timer_set_oc_value(TIM2, TIM_OC3, 0);
+  timer_enable_oc_output(TIM2, TIM_OC1);
+  timer_enable_oc_output(TIM2, TIM_OC3);
+
+  timer_enable_break_main_output(TIM2);
+
+  timer_enable_counter(TIM2);
+}
+
 void dma2_stream0_isr(void) {
   if (dma_get_interrupt_flag(DMA2, DMA_STREAM0, DMA_TCIF)) {
     dma_clear_interrupt_flags(DMA2, DMA_STREAM0, DMA_TCIF);
   }
 }
 
-static void setup_quadrature_encoders() {
+static void setup_quadrature_encoders(void) {
   timer_set_period(TIM4, 0xFFFF);
   timer_slave_set_mode(TIM4, TIM_SMCR_SMS_EM3);
   timer_ic_set_input(TIM4, TIM_IC1, TIM_IC_IN_TI1);
@@ -160,6 +196,7 @@ void setup(void) {
 
   setup_dma_adc1();
   setup_adc1();
+  setup_motors_pwm();
 
   setup_quadrature_encoders();
   setup_systick();

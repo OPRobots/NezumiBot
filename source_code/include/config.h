@@ -18,8 +18,9 @@
 
 #define MICROMETERS_PER_METER 1000000
 
-
 #define MICROMETERS_PER_TICK_MICROMOUSE 78.3699
+
+#define MOTORES_MAX_PWM 1024
 
 
 uint16_t get_start_millis(void);
