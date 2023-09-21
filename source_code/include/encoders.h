@@ -3,9 +3,12 @@
 
 #include "config.h"
 #include "setup.h"
+#include "config.h"
+#include "utils.h"
 
 #include <libopencm3/stm32/timer.h>
 #include <stdint.h>
+#include <math.h>
 
 float get_wheels_separation(void);
 void set_wheels_separation(float value);

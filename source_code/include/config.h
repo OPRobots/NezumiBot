@@ -24,5 +24,6 @@
 
 
 uint16_t get_start_millis(void);
+float get_micrometers_per_tick(void);
 
 #endif
