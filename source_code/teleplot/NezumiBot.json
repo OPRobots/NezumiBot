@@ -1,0 +1,138 @@
+{
+   "widgets": [
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 8,
+            "w": 4,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "S-Izq",
+               "sourceNames": [
+                  "S-Izq"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "S-Izq",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 8,
+            "w": 4,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "SF-Izq",
+               "sourceNames": [
+                  "SF-Izq"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "SF-Izq",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            },
+            {
+               "name": "SF-Der",
+               "sourceNames": [
+                  "SF-Der"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "SF-Der",
+                  "stroke": "rgba(52,152,219,1)",
+                  "fill": "rgba(52,152,219,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 8,
+            "w": 4,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "S-Der",
+               "sourceNames": [
+                  "S-Der"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "S-Der",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 3,
+            "w": 12,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "Encoder Izq",
+               "sourceNames": [
+                  "Encoder Izq"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Encoder Izq",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      },
+      {
+         "type": "chart",
+         "gridPos": {
+            "h": 3,
+            "w": 12,
+            "x": 0,
+            "y": 0
+         },
+         "series": [
+            {
+               "name": "Encoder Der",
+               "sourceNames": [
+                  "Encoder Der"
+               ],
+               "formula": "",
+               "options": {
+                  "_serie": "Encoder Der",
+                  "stroke": "rgba(231,76,60,1)",
+                  "fill": "rgba(231,76,60,0.1)"
+               },
+               "type": "number"
+            }
+         ]
+      }
+   ],
+   "viewDuration": "5"
+}

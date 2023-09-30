@@ -1,33 +1,28 @@
 #include "sensors.h"
 
-static uint8_t sensors_adc[NUM_SENSORS] = {ADC_CHANNEL0, ADC_CHANNEL1, ADC_CHANNEL2, ADC_CHANNEL3};
+static uint8_t sensors_adc[NUM_SENSORS] = {ADC_CHANNEL3, ADC_CHANNEL2, ADC_CHANNEL1, ADC_CHANNEL0};
 static volatile uint16_t sensors_raw[NUM_SENSORS];
 
-static bool sensors_digital[NUM_SENSORS];
-static uint8_t sensors_weight[NUM_SENSORS];
-static uint8_t sensors_position = 0;
-
-
 //////////////////// filtro
-const int UMBRAL = 1700;
 
-bool s0_bool = false;
-bool s1_bool = false;
-bool s2_bool = false;
-bool s3_bool = false;
+bool sensor_bool[NUM_SENSORS] = {false};
 
-int s0 = 0;
-int s1 = 0;
-int s2 = 0;
-int s3 = 0;
+int sensor_filtrado[NUM_SENSORS] = {0};
 
-int Filtro_s0[MAGNITUD_FILTRO];
-int Filtro_s1[MAGNITUD_FILTRO];
-int Filtro_s2[MAGNITUD_FILTRO];
-int Filtro_s3[MAGNITUD_FILTRO];
+int sensor_sumado_filtro[NUM_SENSORS] = {0};
 
-int i_s = 0;
-////////////////////
+int filtro[NUM_SENSORS][MAGNITUD_FILTRO] = {0};
+
+int i_filtro = 0;
+//////////////////// filtro paso bajo
+
+
+int sensor_filtrado_paso_bajo[3][NUM_SENSORS] = {{750}, {750}, {750}};
+int sensor_raw[3][NUM_SENSORS] = {{750},{750},{750}};
+
+float b[3] = {0.00024132, 0.00048264, 0.00024132};
+float a[2] = {1.95558189, -0.95654717};
+
 
 uint8_t get_sensors_num() {
   return NUM_SENSORS;
@@ -42,66 +37,90 @@ volatile uint16_t *get_sensors_raw() {
 }
 
 uint16_t get_sensor_raw(enum SENSORS index) {
+  if(index == SENSOR_FRONT_RIGHT){
+    return sensors_raw[index] + 50;
+  }
+  if(index == SENSOR_RIGHT){
+    return sensors_raw[index] + 95;
+  }
   return sensors_raw[index];
 }
 
-uint16_t get_sensor_calibrated(enum SENSORS index) {
-    if (sensors_raw[index] > RIVAL_SENSOR_THRESHOLD && sensors_raw[index] < RIVAL_SENSOR_MAX) {
-        return sensors_raw[index];
+uint16_t get_sensor_calibrated(enum SENSORS index) { // devuelve 0 en las zonas que el sensor tiene ruido (cerca - lejos)  
+    int valor_sensor = get_sensor_raw(index);
+    if (valor_sensor > UMBRAL_RUIDO_INFERIOR && valor_sensor < UMBRAL_RUIDO_SUPERIOR) {
+        return valor_sensor;
+    } else if(valor_sensor >= UMBRAL_RUIDO_SUPERIOR) {
+        return UMBRAL_RUIDO_SUPERIOR + 10;
     } else {
-        return 0;
+        return UMBRAL_RUIDO_INFERIOR - 10;
     }
 }
 
-bool get_sensor_digital(enum SENSORS index) {
-    if (sensors_raw[index] > RIVAL_SENSOR_THRESHOLD && sensors_raw[index] < RIVAL_SENSOR_MAX) {
-        return true;
-    }
-    return false;
+uint16_t get_sensor_filtered(enum SENSORS index) { // filtrado con media de magnitud_filtro
+  return sensor_filtrado[index];
 }
 
-void update_sensors_readings(void) {
-  uint32_t sensor_avg = 0;
-  uint32_t sensor_sum = 0;
-  for (uint8_t sensor = 0; sensor < NUM_SENSORS; sensor++) {
-    sensors_digital[sensor] = sensors_raw[sensor] > RIVAL_SENSOR_THRESHOLD;
-    sensors_weight[sensor] = sensors_raw[sensor] > RIVAL_SENSOR_THRESHOLD ? map(sensors_raw[sensor], RIVAL_SENSOR_THRESHOLD, RIVAL_SENSOR_MAX, 1, 10) : 0;
+uint16_t get_sensor_mapped(enum SENSORS index) { // filtrado con media de magnitud_filtro
+  return map(sensor_filtrado[index], 140, 2320, 0, 1024);
+}
+bool get_sensor_bool(enum SENSORS index) {
+    return sensor_bool[index];
+}
 
-    if (sensors_digital[sensor]) {
-      sensor_avg += sensors_weight[sensor] * (sensor * 1) * 1000;
-      sensor_sum += sensors_weight[sensor];
-    }
+void actualizar_bool(int i_sensor){
+  if(i_sensor == 0 || i_sensor == 3){
+    sensor_filtrado[0] = (sensor_filtrado[0] + sensor_filtrado[3])/2;
+    sensor_bool[0] = sensor_filtrado[0] > UMBRAL_DETECCION_FRONTAL;
+  }else if(i_sensor == 1 ){
+    sensor_bool[i_sensor] = sensor_filtrado[i_sensor] > UMBRAL_DETECCION_FRONTAL;
+  } else{
+    sensor_bool[i_sensor] = sensor_filtrado[i_sensor] > UMBRAL_DETECCION_FRONTAL;
   }
-  sensors_position = sensor_avg / sensor_sum - (NUM_SENSORS) * 1000 / 2;
 }
 
 void filtro_sensores(void) {
 
-  Filtro_s0[i_s] = get_sensor_raw(0);
-  Filtro_s1[i_s] = get_sensor_raw(1);
-  Filtro_s2[i_s] = get_sensor_raw(2);
-  Filtro_s3[i_s] = get_sensor_raw(3);
-  i_s = (i_s + 1) % MAGNITUD_FILTRO; // Avanza el índice circularmente cuando supera MAGNITUD FILTRO vuelve a ser 0
+  for (int i_sensor = 0; i_sensor < NUM_SENSORS; i_sensor++){
+    sensor_sumado_filtro[i_sensor] = sensor_sumado_filtro[i_sensor] - filtro[i_sensor][i_filtro]; // tenemos un sumatorio total, se resta el valor antiguo, se actualiza y se suma el nuevo.
+    filtro[i_sensor][i_filtro] = get_sensor_calibrated(i_sensor); //actualizar valor
+    sensor_sumado_filtro[i_sensor] = sensor_sumado_filtro[i_sensor] + filtro[i_sensor][i_filtro];
+    sensor_filtrado[i_sensor] = sensor_sumado_filtro[i_sensor] / MAGNITUD_FILTRO;
 
-  s0 = 0;
-  s1 = 0;
-  s2 = 0;
-  s3 = 0;
-  
-  for (int i = 0; i < MAGNITUD_FILTRO; i++) {
-    s0 += Filtro_s1[i];
-    s1 += Filtro_s1[i];
-    s2 += Filtro_s2[i];
-    s3 += Filtro_s3[i];
+    if(i_sensor == 0 || i_sensor == 3){
+      sensor_filtrado[0] = (sensor_filtrado[0] + sensor_filtrado[3])/2;
+    }
+    actualizar_bool(i_sensor);
   }
+  
+  i_filtro = (i_filtro + 1) % MAGNITUD_FILTRO; // Avanza el índice circularmente cuando supera MAGNITUD FILTRO vuelve a ser 0
+}
 
-  s0 = s0 / MAGNITUD_FILTRO;
-  s1 = s1 / MAGNITUD_FILTRO;
-  s2 = s2 / MAGNITUD_FILTRO;
-  s3 = s3 / MAGNITUD_FILTRO;
+void filtro_paso_bajo_1(void){ // filtro paso bajo magnitud 1
+  for (int i_sensor = 0; i_sensor < NUM_SENSORS; i_sensor++){
+    sensor_raw[0][i_sensor] = get_sensor_calibrated(i_sensor);
+    sensor_filtrado_paso_bajo[0][i_sensor] = 0.969*sensor_filtrado_paso_bajo[1][i_sensor] + 0.0155*sensor_raw[0][i_sensor] + 0.0155*sensor_raw[1][i_sensor]; // magnitud 5
+    //sensor_filtrado_paso_bajo[0][i_sensor] = 0.993*sensor_filtrado_paso_bajo[1][i_sensor] + 0.00313*sensor_raw[0][i_sensor] + 0.00313*sensor_raw[1][i_sensor]; // magintud 2
 
-  s0_bool = s0 > UMBRAL;
-  s1_bool = s1 > UMBRAL;
-  s2_bool = s2 > UMBRAL;
-  s3_bool = s3 > UMBRAL;
+    sensor_filtrado_paso_bajo[1][i_sensor] = sensor_filtrado_paso_bajo[0][i_sensor]; //guardamos valores anteriores
+    sensor_raw[1][i_sensor] = sensor_raw[0][i_sensor];
+
+    sensor_filtrado[i_sensor] = sensor_filtrado_paso_bajo[0][i_sensor]; // guardamos en la misma variables que los otros filtros para que sea intercambiable
+    actualizar_bool(i_sensor);
+  }
+}
+
+void filtro_paso_bajo_2(void){ // filtro paso bajo magnitud 2 (falta ajustar la magnitud y recalcular los valores ya que filtra demasiado y tiende a 0)
+  for (int i_sensor = 0; i_sensor < NUM_SENSORS; i_sensor++){
+    sensor_raw[0][i_sensor] = get_sensor_calibrated(i_sensor);
+    sensor_filtrado_paso_bajo[0][i_sensor] = a[0]*sensor_filtrado_paso_bajo[1][i_sensor] + a[1]*sensor_filtrado_paso_bajo[2][i_sensor] + b[0]*sensor_raw[0][i_sensor] + b[1]*sensor_raw[1][i_sensor] + b[2]*sensor_raw[2][i_sensor];
+  
+    sensor_filtrado_paso_bajo[2][i_sensor] = sensor_filtrado_paso_bajo[1][i_sensor]; // guardamos los anteriores
+    sensor_filtrado_paso_bajo[1][i_sensor] = sensor_filtrado_paso_bajo[0][i_sensor];
+    sensor_raw[2][i_sensor] = sensor_raw[1][i_sensor]; 
+    sensor_raw[1][i_sensor] = sensor_raw[0][i_sensor]; 
+
+    sensor_filtrado[i_sensor] = sensor_filtrado_paso_bajo[0][i_sensor]; // guardamos en la misma variables que los otros filtros para que sea intercambiable
+    actualizar_bool(i_sensor);
+  }
 }
