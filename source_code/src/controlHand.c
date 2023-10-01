@@ -11,7 +11,7 @@ float p = 0;
 float d = 0;
 
 float kp = 0.1;
-float kd = 0;
+float kd = 0.06;
 float kf = 0;  // constante que determina cuanto afecta el sensor frontal para los giros dinamicos
 
 int ultError = 0;
