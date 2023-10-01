@@ -12,8 +12,7 @@
 #define UMBRAL_RUIDO_INFERIOR 140 // umbrales de ruido para dejar de leer ruido y poner 0 (calibrados!)
 #define UMBRAL_RUIDO_SUPERIOR 2320
 
-#define UMBRAL_DETECCION_FRONTAL 870 // supuestamete calibrado
-#define UMBRAL_DETECCION_FRONTAL 870 // supuestamete calibrado
+#define UMBRAL_DETECCION_FRONTAL 870 // supuestamete calibrado 870
 
 #define MAGNITUD_FILTRO 20
 

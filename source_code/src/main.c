@@ -14,15 +14,22 @@ void sys_tick_handler(void) {
 int main(void) {
 	setup();
 	gpio_set(GPIOB, GPIO0);
+	delay(1000);
+	setObjetivoD(get_sensor_mapped(SENSOR_RIGHT));
 	while (true) {
 		/////
 		
 		controlMano();
 
+
 		/////
 		//tests
 		 
 	
+
+
+
+
 
 
 		 //prints
