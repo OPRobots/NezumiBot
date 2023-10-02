@@ -60,7 +60,7 @@ void controlMano(void) {
                 set_motors_speed(40, -40);
                 delay(170);
                 set_motors_speed(0, 0);
-                delay(40); //100 //50
+                delay(50); //100 //50
                 return;
             }
         }
@@ -78,7 +78,7 @@ void controlMano(void) {
                 set_motors_speed(-40, 40);
                 delay(170);
                 set_motors_speed(0, 0);
-                delay(40); //100 //50
+                delay(50); //100 //50
                 return;
             }
         }

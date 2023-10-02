@@ -15,7 +15,7 @@
 
 #define TIEMPO_FILTRO 20
 #define DINAMICO false
-#define MAX_ERROR_PID_D 140 // si se sube este valor el arco de giro aumenta // 125 // 140
+#define MAX_ERROR_PID_D 210 // si se sube este valor el arco de giro aumenta // 125 // 140
 #define MAX_ERROR_PID_I 240 // si se sube este valor el arco de giro aumenta  160 // 135
 
 void setObjetivos(int objetivoI, int objetivoD);
