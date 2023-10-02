@@ -33,7 +33,8 @@ void actualizar_bool(int i_sensor);
 
 
 // filtros, usar solo uno de estos dentro de sys_tick_handler() en main
-void filtro_sensores(void);
+void filtro_media(void);
+void filtro_media_paso_bajo_1(void);
 void filtro_paso_bajo_1(void);
 void filtro_paso_bajo_2(void);
 

@@ -79,11 +79,34 @@ void actualizar_bool(int i_sensor){
   }
 }
 
-void filtro_sensores(void) {
+void filtro_media(void) {
 
   for (int i_sensor = 0; i_sensor < NUM_SENSORS; i_sensor++){
     sensor_sumado_filtro[i_sensor] = sensor_sumado_filtro[i_sensor] - filtro[i_sensor][i_filtro]; // tenemos un sumatorio total, se resta el valor antiguo, se actualiza y se suma el nuevo.
     filtro[i_sensor][i_filtro] = get_sensor_calibrated(i_sensor); //actualizar valor
+    sensor_sumado_filtro[i_sensor] = sensor_sumado_filtro[i_sensor] + filtro[i_sensor][i_filtro];
+    sensor_filtrado[i_sensor] = sensor_sumado_filtro[i_sensor] / MAGNITUD_FILTRO;
+
+    if(i_sensor == 0 || i_sensor == 3){
+      sensor_filtrado[0] = (sensor_filtrado[0] + sensor_filtrado[3])/2;
+    }
+    actualizar_bool(i_sensor);
+  }
+  
+  i_filtro = (i_filtro + 1) % MAGNITUD_FILTRO; // Avanza el índice circularmente cuando supera MAGNITUD FILTRO vuelve a ser 0
+}
+
+void filtro_media_paso_bajo_1(void){
+  
+  for (int i_sensor = 0; i_sensor < NUM_SENSORS; i_sensor++){
+    sensor_raw[0][i_sensor] = get_sensor_calibrated(i_sensor);
+    sensor_filtrado_paso_bajo[0][i_sensor] = 0.969*sensor_filtrado_paso_bajo[1][i_sensor] + 0.0155*sensor_raw[0][i_sensor] + 0.0155*sensor_raw[1][i_sensor]; // magnitud 5
+    //sensor_filtrado_paso_bajo[0][i_sensor] = 0.993*sensor_filtrado_paso_bajo[1][i_sensor] + 0.00313*sensor_raw[0][i_sensor] + 0.00313*sensor_raw[1][i_sensor]; // magintud 2
+    sensor_filtrado_paso_bajo[1][i_sensor] = sensor_filtrado_paso_bajo[0][i_sensor]; //guardamos valores anteriores
+    sensor_raw[1][i_sensor] = sensor_raw[0][i_sensor];
+
+    sensor_sumado_filtro[i_sensor] = sensor_sumado_filtro[i_sensor] - filtro[i_sensor][i_filtro]; // tenemos un sumatorio total, se resta el valor antiguo, se actualiza y se suma el nuevo.
+    filtro[i_sensor][i_filtro] = sensor_filtrado_paso_bajo[0][i_sensor]; //actualizar valor
     sensor_sumado_filtro[i_sensor] = sensor_sumado_filtro[i_sensor] + filtro[i_sensor][i_filtro];
     sensor_filtrado[i_sensor] = sensor_sumado_filtro[i_sensor] / MAGNITUD_FILTRO;
 
@@ -106,6 +129,10 @@ void filtro_paso_bajo_1(void){ // filtro paso bajo magnitud 1
     sensor_raw[1][i_sensor] = sensor_raw[0][i_sensor];
 
     sensor_filtrado[i_sensor] = sensor_filtrado_paso_bajo[0][i_sensor]; // guardamos en la misma variables que los otros filtros para que sea intercambiable
+
+    if(i_sensor == 0 || i_sensor == 3){
+      sensor_filtrado[0] = (sensor_filtrado[0] + sensor_filtrado[3])/2;
+    }
     actualizar_bool(i_sensor);
   }
 }
