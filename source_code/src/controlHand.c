@@ -28,11 +28,14 @@ long millis_PID = 1;
 
 unsigned long startedMillis = 0;
 
-bool iniciado = false;
 
 void setObjetivos(int objetivoI, int objetivoD){
     objetivo_I = objetivoI;
     objetivo_D = objetivoD;
+}
+
+void setMano(bool mano_in){
+    mano = mano_in;
 }
 
 void controlMano(void) {

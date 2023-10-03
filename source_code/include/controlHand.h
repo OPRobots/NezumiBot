@@ -19,6 +19,7 @@
 #define MAX_ERROR_PID_I 240 // si se sube este valor el arco de giro aumenta  160 // 135
 
 void setObjetivos(int objetivoI, int objetivoD);
+void setMano(bool mano_in);
 void controlMano(void);
 
 
