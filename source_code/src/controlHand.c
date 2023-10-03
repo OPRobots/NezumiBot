@@ -21,17 +21,28 @@ int ultError = 0;
 int correccion = 0;
 bool frontal = false;
 
-long millis_PID = 1;
+unsigned long millis_PID = 1;
+unsigned long time_millis = 0;
+
+unsigned long millis_empieza_cambios = 45000;
+unsigned long millis_cambio_mano = 30000;
+unsigned long time_cambio_mano = 0;
+
+bool toca_fiesta = false;
+bool empezo_la_fiesta = false;
 
 // bool parpadeo_led_D = false;
 // bool parpadeo_led_I = false;
 
 unsigned long startedMillis = 0;
 
-
 void setObjetivos(int objetivoI, int objetivoD){
     objetivo_I = objetivoI;
     objetivo_D = objetivoD;
+}
+
+void setFiesta(bool fiesta){
+    toca_fiesta = fiesta;
 }
 
 void setMano(bool mano_in){
@@ -39,10 +50,22 @@ void setMano(bool mano_in){
 }
 
 void controlMano(void) {
+
+    if(toca_fiesta == true){
+        if (empezo_la_fiesta == false && (get_clock_ticks() - time_cambio_mano > millis_empieza_cambios)){
+            mano = !mano;
+            empezo_la_fiesta = true;
+            time_cambio_mano = get_clock_ticks();
+        } else if(empezo_la_fiesta == true && get_clock_ticks() - time_cambio_mano > millis_cambio_mano){
+            mano = !mano;
+            time_cambio_mano = get_clock_ticks();
+        }
+    }
+
     //////////////////////////////////////////////
     ////         TODO EL CODIGO!!!!          /////
     //////////////////////////////////////////////
-    if ( get_clock_ticks() - millis_PID >= 1) { //ajustar
+    if ( get_clock_ticks() - time_millis >= millis_PID) { //ajustar
 
         if (get_sensor_bool(SENSOR_FRONT_LEFT)) {
             frontal = true;
@@ -106,12 +129,11 @@ void controlMano(void) {
         
         //printf("correccio: %5d\n", correccion);
         set_motors_speed(velBase - correccion, velBase + correccion);
-    
-        millis_PID = get_clock_ticks();
+        time_millis = get_clock_ticks();
     }
     //////////////////////////////////////////////
     ////     Y HASTA AQUI EL CODIGO!!!!      /////
     //////////////////////////////////////////////
-
+    
 }
 

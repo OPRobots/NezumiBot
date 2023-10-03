@@ -20,6 +20,7 @@
 
 void setObjetivos(int objetivoI, int objetivoD);
 void setMano(bool mano_in);
+void setFiesta(bool fiesta);
 void controlMano(void);
 
 

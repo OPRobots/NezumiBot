@@ -6,6 +6,7 @@
 
 #define ever ;;
 
+bool set_fiesta_cambios = false;
 bool configurado = false;
 bool iniciado = false;
 
@@ -28,8 +29,6 @@ int main(void) {
 			/////
 			//tests
 
-
-
 			//prints
 			//printf(">SF-Izq:%d\n", get_sensor_raw(SENSOR_FRONT_LEFT));
 			//printf(">S-Izq:%d\n", get_sensor_raw(SENSOR_LEFT));
@@ -48,31 +47,48 @@ int main(void) {
 			//printf(">Encoder Der: %ld\n", get_encoder_right_total_ticks());
 		
 			//set_motors_speed(-30, -30);
+
 		}else{
-			if(configurado == false){
+			if(set_fiesta_cambios == false){
 				if(get_sensor_bool(SENSOR_LEFT)){
-					set_motors_speed(30, 0);
+					set_motors_speed(-30, -30);
 					delay(500);
 					set_motors_speed(0, 0);
-					setMano(IZQUIERDA);
-					configurado = true;
+					setFiesta(true);
+					set_fiesta_cambios = true;
 				}
 				if(get_sensor_bool(SENSOR_RIGHT)){
-					set_motors_speed(0, 30);
+					set_motors_speed(30, 30);
 					delay(500);
 					set_motors_speed(0, 0);
-					setMano(DERECHA);
-					configurado = true;
+					set_fiesta_cambios = true;
 				}
 			}else{
-				for(ever){
-					if(get_sensor_bool(SENSOR_FRONT_LEFT)){
-						break;
+				if(configurado == false){
+					if(get_sensor_bool(SENSOR_LEFT)){
+						set_motors_speed(30, 0);
+						delay(500);
+						set_motors_speed(0, 0);
+						setMano(IZQUIERDA);
+						configurado = true;
 					}
+					if(get_sensor_bool(SENSOR_RIGHT)){
+						set_motors_speed(0, 30);
+						delay(500);
+						set_motors_speed(0, 0);
+						setMano(DERECHA);
+						configurado = true;
+					}
+				}else{
+					for(ever){
+						if(get_sensor_bool(SENSOR_FRONT_LEFT)){
+							break;
+						}
+					}
+					delay(2000);
+					setObjetivos(get_sensor_mapped(SENSOR_LEFT), get_sensor_mapped(SENSOR_RIGHT));
+					iniciado = true;
 				}
-				delay(2000);
-				setObjetivos(get_sensor_mapped(SENSOR_LEFT), get_sensor_mapped(SENSOR_RIGHT));
-				iniciado = true;
 			}
 		}
 	}
