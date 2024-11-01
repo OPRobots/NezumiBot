@@ -81,7 +81,7 @@ int main(void) {
 					}
 				}else{
 					for(ever){
-						if(get_sensor_bool(SENSOR_FRONT_LEFT)){
+						if(get_sensor_bool(SENSOR_FRONT_LEFT)||	gpio_get(GPIOB, GPIO9)){
 							break;
 						}
 					}

@@ -50,7 +50,9 @@ void setMano(bool mano_in){
 }
 
 void controlMano(void) {
-
+    if(!gpio_get(GPIOB, GPIO9)){
+        set_motors_speed(0, 0);
+    }
     if(toca_fiesta == true){
         if (empezo_la_fiesta == false && (get_clock_ticks() - time_cambio_mano > millis_empieza_cambios)){
             mano = !mano;
