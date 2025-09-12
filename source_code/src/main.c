@@ -16,14 +16,27 @@ void sys_tick_handler(void) {
   filtro_media();
 }
 
+/*
+encender:
+
+--menu fiesta de cambios--
+sensor derecha: no hay fiesta
+sensor izquierda: si hay fiesta
+
+--menu seleccion mano--
+sensor derecha: mano derecha
+sensor izquierda: mano izquierda
+
+--espera para iniciar--
+sensor frontal izquierda: iniciar!
+*/
+
 int main(void) {
 	setup();
 	gpio_set(GPIOB, GPIO0);
-
 	while(true){		
 		if(iniciado == true) {
 			/////
-			
 			controlMano();
 
 			/////
