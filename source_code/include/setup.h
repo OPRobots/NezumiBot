@@ -14,7 +14,6 @@
 #include "config.h"
 #include "sensors.h"
 #include "usart.h"
-#include "encoders.h"
 
 void setup(void);
 

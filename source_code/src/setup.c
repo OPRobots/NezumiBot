@@ -22,8 +22,6 @@ static void setup_clock(void) {
   rcc_periph_clock_enable(RCC_DMA2);
   
   rcc_periph_clock_enable(RCC_TIM2);
-  rcc_periph_clock_enable(RCC_TIM3);
-  rcc_periph_clock_enable(RCC_TIM4);
 
   dwt_enable_cycle_counter();
 }
@@ -41,7 +39,7 @@ static void setup_systick(void) {
 static void setup_timer_priorities(void) {
   nvic_set_priority(NVIC_SYSTICK_IRQ, 16 * 1);
   nvic_set_priority(NVIC_DMA2_STREAM0_IRQ, 16 * 2);
-  nvic_set_priority(NVIC_USART1_IRQ, 16 * 4);
+  nvic_set_priority(NVIC_USART1_IRQ, 16 * 2);
 
 
   nvic_enable_irq(NVIC_DMA2_STREAM0_IRQ);
@@ -60,10 +58,6 @@ static void setup_gpio(void) {
 
   // Entradas analógicas sensores
   gpio_mode_setup(GPIOA, GPIO_MODE_ANALOG, GPIO_PUPD_NONE, GPIO0 | GPIO1 | GPIO2 | GPIO3 );
-
-   // Entradas Encoders
-  gpio_mode_setup(GPIOB, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO4 | GPIO5 | GPIO6 | GPIO7);
-  gpio_set_af(GPIOB, GPIO_AF2, GPIO4 | GPIO5 | GPIO6 | GPIO7);
 
     // Salida PWM Motores
   gpio_mode_setup(GPIOA, GPIO_MODE_AF, GPIO_PUPD_NONE, GPIO5);
@@ -105,7 +99,6 @@ static void setup_adc1(void) {
 
   adc_set_regular_sequence(ADC1, get_sensors_num(), get_sensors());
   adc_set_continuous_conversion_mode(ADC1);
-  adc_enable_eoc_interrupt(ADC1);
 
   adc_power_on(ADC1);
   int i;
@@ -173,20 +166,6 @@ void dma2_stream0_isr(void) {
   }
 }
 
-static void setup_quadrature_encoders(void) {
-  timer_set_period(TIM4, 0xFFFF);
-  timer_slave_set_mode(TIM4, TIM_SMCR_SMS_EM3);
-  timer_ic_set_input(TIM4, TIM_IC1, TIM_IC_IN_TI1);
-  timer_ic_set_input(TIM4, TIM_IC2, TIM_IC_IN_TI2);
-  timer_enable_counter(TIM4);
-
-  timer_set_period(TIM3, 0xFFFF);
-  timer_slave_set_mode(TIM3, TIM_SMCR_SMS_EM3);
-  timer_ic_set_input(TIM3, TIM_IC1, TIM_IC_IN_TI1);
-  timer_ic_set_input(TIM3, TIM_IC2, TIM_IC_IN_TI2);
-  timer_enable_counter(TIM3);
-}
-
 void setup(void) {
   setup_clock();
   setup_gpio();
@@ -197,6 +176,5 @@ void setup(void) {
   setup_adc1();
   setup_motors_pwm();
 
-  setup_quadrature_encoders();
   setup_systick();
 }

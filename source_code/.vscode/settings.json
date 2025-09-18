@@ -1,7 +1,6 @@
 {
     "files.associations": {
         "usart.h": "c",
-        "motors.h": "c",
-        "encoders.h": "c"
+        "motors.h": "c"
     }
 }
