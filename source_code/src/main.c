@@ -12,7 +12,7 @@ bool iniciado = false;
 
 void sys_tick_handler(void) {
   clock_tick();
-  update_encoder_readings();
+  //update_encoder_readings();
   filtro_media();
 }
 
@@ -35,42 +35,86 @@ int main(void) {
 	setup();
 	gpio_set(GPIOB, GPIO0);
 	while(true){		
+		//printf("SF-Izq: %4d\tS-Izq: %4d\tS-Der: %4d\tSF-Der: %4d\n", get_sensor_bool(SENSOR_FRONT_LEFT), get_sensor_bool(SENSOR_LEFT), get_sensor_bool(SENSOR_RIGHT), get_sensor_bool(SENSOR_FRONT_RIGHT));
+		//printf("SF-Izq: %4d\tS-Izq: %4d\tS-Der: %4d\tSF-Der: %4d\n", get_sensor_filtered(SENSOR_FRONT_LEFT), get_sensor_filtered(SENSOR_LEFT), get_sensor_filtered(SENSOR_RIGHT), get_sensor_filtered(SENSOR_FRONT_RIGHT));
+
 		if(iniciado == true) {
+			
+			printf("> En control iniciado\t");
 			/////
-			controlMano();
+			//controlMano();
 
 			/////
 			//tests
 
 			//prints
+
+			//delay(50);
+
 			//printf(">SF-Izq:%d\n", get_sensor_raw(SENSOR_FRONT_LEFT));
 			//printf(">S-Izq:%d\n", get_sensor_raw(SENSOR_LEFT));
 			//printf(">S-Der:%d\n", get_sensor_raw(SENSOR_RIGHT));
 			//printf(">SF-Der:%d\n", get_sensor_raw(SENSOR_FRONT_RIGHT));
-
 			//printf("SF-Izq: %4d\tS-Izq: %4d\tSF-Der: %4d\tSF-Der: %4d\n", get_sensor_raw(SENSOR_FRONT_LEFT), get_sensor_raw(SENSOR_LEFT), get_sensor_raw(SENSOR_RIGHT), get_sensor_raw(SENSOR_FRONT_RIGHT));
 
-			//delay(50);
 			//printf(">SF-Izq:%d\n", get_sensor_filtered(SENSOR_FRONT_LEFT));
 			//printf(">S-Izq:%d\n", get_sensor_filtered(SENSOR_LEFT));
 			//printf(">S-Der:%d\n", get_sensor_filtered(SENSOR_RIGHT));
 			//printf(">SF-Der:%d\n", get_sensor_filtered(SENSOR_FRONT_RIGHT));
+			//printf("SF-Izq: %4d\tS-Izq: %4d\tS-Der: %4d\tSF-Der: %4d\n", get_sensor_filtered(SENSOR_FRONT_LEFT), get_sensor_filtered(SENSOR_LEFT), get_sensor_filtered(SENSOR_RIGHT), get_sensor_filtered(SENSOR_FRONT_RIGHT));
+
+			//printf(">SF-Izq:%d\n", get_sensor_bool(SENSOR_FRONT_LEFT));
+			//printf(">S-Izq:%d\n", get_sensor_bool(SENSOR_LEFT));
+			//printf(">S-Der:%d\n", get_sensor_bool(SENSOR_RIGHT));
+			//printf(">SF-Der:%d\n", get_sensor_bool(SENSOR_FRONT_RIGHT));
+			//printf("SF-Izq: %4d\tS-Izq: %4d\tS-Der: %4d\tSF-Der: %4d\n", get_sensor_bool(SENSOR_FRONT_LEFT), get_sensor_bool(SENSOR_LEFT), get_sensor_bool(SENSOR_RIGHT), get_sensor_bool(SENSOR_FRONT_RIGHT));
+
 
 			//printf(">Encoder Izq: %ld\n", get_encoder_left_total_ticks());
 			//printf(">Encoder Der: %ld\n", get_encoder_right_total_ticks());
-		
-			//set_motors_speed(-30, -30);
+
+			
+			//set_motors_speed(0, 40);
+
+
+			
+			set_motors_speed(30, 30);
+			delay(150);
+			set_motors_speed(0, 0);
+			delay(100);
+			set_motors_speed(-30, -30);
+			delay(150);
+			set_motors_speed(0, 0);
+			delay(1000);
+			set_motors_speed(30, 0);
+			delay(150);
+			set_motors_speed(0, 0);
+			delay(100);
+			set_motors_speed(-30, 0);
+			delay(150);
+			set_motors_speed(0, 0);
+			delay(1000);
+			set_motors_speed(0, 30);
+			delay(150);
+			set_motors_speed(0, 0);
+			delay(100);
+			set_motors_speed(0, -30);
+			delay(150);
+			set_motors_speed(0, 0);
+			delay(1000);
+			
 
 		}else{
 			if(set_fiesta_cambios == false){
-				if(get_sensor_bool(SENSOR_LEFT)){
+				printf("> En fiesta de cambios\t");
+				if(get_sensor_bool(SENSOR_LEFT) && get_sensor_bool(SENSOR_FRONT_LEFT)){
 					set_motors_speed(-30, -30);
 					delay(500);
 					set_motors_speed(0, 0);
 					setFiesta(true);
 					set_fiesta_cambios = true;
 				}
-				if(get_sensor_bool(SENSOR_RIGHT)){
+				if(get_sensor_bool(SENSOR_RIGHT) && get_sensor_bool(SENSOR_FRONT_RIGHT)){
 					set_motors_speed(30, 30);
 					delay(500);
 					set_motors_speed(0, 0);
@@ -78,14 +122,15 @@ int main(void) {
 				}
 			}else{
 				if(configurado == false){
-					if(get_sensor_bool(SENSOR_LEFT)){
+					printf("> En configuracion\t");
+					if(get_sensor_bool(SENSOR_LEFT) && get_sensor_bool(SENSOR_FRONT_LEFT)){
 						set_motors_speed(30, 0);
 						delay(500);
 						set_motors_speed(0, 0);
 						setMano(IZQUIERDA);
 						configurado = true;
 					}
-					if(get_sensor_bool(SENSOR_RIGHT)){
+					if(get_sensor_bool(SENSOR_RIGHT) && get_sensor_bool(SENSOR_FRONT_RIGHT)){
 						set_motors_speed(0, 30);
 						delay(500);
 						set_motors_speed(0, 0);
@@ -94,7 +139,8 @@ int main(void) {
 					}
 				}else{
 					for(ever){
-						if(get_sensor_bool(SENSOR_FRONT_LEFT)||	gpio_get(GPIOB, GPIO9)){
+						printf("> En espera de inicio\n");
+						if((get_sensor_bool(SENSOR_RIGHT) && get_sensor_bool(SENSOR_FRONT_RIGHT)) ||	gpio_get(GPIOB, GPIO9)){
 							break;
 						}
 					}

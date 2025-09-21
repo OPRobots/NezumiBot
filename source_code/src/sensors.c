@@ -38,10 +38,10 @@ volatile uint16_t *get_sensors_raw() {
 
 uint16_t get_sensor_raw(enum SENSORS index) {
   if(index == SENSOR_FRONT_RIGHT){
-    return sensors_raw[index] + 50;
+    return sensors_raw[index];// + 50;
   }
   if(index == SENSOR_RIGHT){
-    return sensors_raw[index] + 95;
+    return sensors_raw[index];// + 95;
   }
   return sensors_raw[index];
 }
@@ -69,14 +69,7 @@ bool get_sensor_bool(enum SENSORS index) {
 }
 
 void actualizar_bool(int i_sensor){
-  if(i_sensor == 0 || i_sensor == 3){
-    sensor_filtrado[0] = (sensor_filtrado[0] + sensor_filtrado[3])/2;
-    sensor_bool[0] = sensor_filtrado[0] > UMBRAL_DETECCION_FRONTAL;
-  }else if(i_sensor == 1 ){
     sensor_bool[i_sensor] = sensor_filtrado[i_sensor] > UMBRAL_DETECCION_FRONTAL;
-  } else{
-    sensor_bool[i_sensor] = sensor_filtrado[i_sensor] > UMBRAL_DETECCION_FRONTAL;
-  }
 }
 
 void filtro_media(void) {

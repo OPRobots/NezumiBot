@@ -197,6 +197,6 @@ void setup(void) {
   setup_adc1();
   setup_motors_pwm();
 
-  setup_quadrature_encoders();
+  //setup_quadrature_encoders();
   setup_systick();
 }
