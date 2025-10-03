@@ -24,8 +24,8 @@ bool frontal = false;
 unsigned long millis_PID = 1;
 unsigned long time_millis = 0;
 
-unsigned long millis_empieza_cambios = 45000;
-unsigned long millis_cambio_mano = 30000;
+unsigned long millis_empieza_cambios = 15000;
+unsigned long millis_cambio_mano = 3000;
 unsigned long time_cambio_mano = 0;
 
 bool toca_fiesta = false;

@@ -38,10 +38,10 @@ volatile uint16_t *get_sensors_raw() {
 
 uint16_t get_sensor_raw(enum SENSORS index) {
   if(index == SENSOR_FRONT_RIGHT){
-    return sensors_raw[index] + 50;
+    return sensors_raw[index] + 74;
   }
-  if(index == SENSOR_RIGHT){
-    return sensors_raw[index] + 95;
+  if(index == SENSOR_LEFT){
+    return sensors_raw[index] + 50;
   }
   return sensors_raw[index];
 }
